@@ -1,0 +1,4 @@
+.cpcache/
+.lsp/
+node_modules/
+.shadow-cljs/

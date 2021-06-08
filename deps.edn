@@ -1,0 +1,25 @@
+{:paths   ["src" "resources"]
+ :deps    {org.clojure/clojure    {:mvn/version "1.10.3"}
+           com.taoensso/timbre    {:mvn/version "5.1.2"}
+           aero/aero              {:mvn/version "1.1.6"}
+           integrant/repl         {:mvn/version "0.3.2"}
+           integrant/integrant    {:mvn/version "0.8.0"}
+           http-kit/http-kit      {:mvn/version "2.5.3"}
+           metosin/reitit         {:mvn/version "0.5.13"}
+           ring/ring              {:mvn/version "1.9.3"}
+           com.fulcrologic/fulcro {:mvn/version "3.4.22"}
+           com.wsscode/pathom     {:mvn/version "2.3.1"}}
+ :aliases {:run {:main-opts ["-m" "app.api"]}
+           :dev {:extra-paths ["dev"]
+                 :extra-deps {;; cljs deps
+                              org.clojure/clojurescript   {:mvn/version "1.10.866"}
+                              thheller/shadow-cljs        {:mvn/version "2.14.4"}
+                              fulcrologic/fulcro-spec     {:mvn/version "3.1.12"}
+                              binaryage/devtools          {:mvn/version "1.0.3"}
+                              org.clojure/tools.namespace {:mvn/version "1.1.0"}
+                              juxt/crux-http-server       {:mvn/version "21.05-1.17.0-alpha"}
+
+                              ;; jvm clj repl
+                              nrepl/nrepl {:mvn/version "RELEASE"}
+                              cider/cider-nrepl {:mvn/version "RELEASE"}}
+                 :main-opts ["-m" "nrepl.cmdline" "--middleware" "[cider.nrepl/cider-middleware]" "--interactive"]}}}
