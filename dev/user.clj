@@ -4,20 +4,20 @@
             [integrant.repl.state :as state]
             [nrepl.server]
             [cider.nrepl :refer [cider-nrepl-handler]]
-            [app.system :as system]))
+            [app.api.system :as system]))
 
 (ig-repl/set-prep!
  (fn []
-   (system/read-config-file "resources/config.edn")))
+   (system/read-config-file "resources/config/dev.edn")))
 
-(defn start-dev 
+(defn start-dev
   "
   Entrypoint for clj -X:dev
   Start nrepl server with cider middleware and start system
   WARNING: Do not reload user namespace
   "
   [& _]
-  (nrepl.server/start-server :port 12345
+  (nrepl.server/start-server :port 1234
                              :bind "0.0.0.0"
                              :handler cider-nrepl-handler)
   (go))
