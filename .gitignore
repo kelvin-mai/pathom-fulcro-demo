@@ -2,3 +2,4 @@
 .lsp/
 node_modules/
 .shadow-cljs/
+resources/config/prod.edn

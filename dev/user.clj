@@ -14,7 +14,6 @@
   "
   Entrypoint for clj -X:dev
   Start nrepl server with cider middleware and start system
-  WARNING: Do not reload user namespace
   "
   [& _]
   (nrepl.server/start-server :port 1234

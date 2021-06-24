@@ -1,3 +1,0 @@
-{:http/server {:handler #ig/ref :app/routes
-               :port #or [#env PORT 8080]}
- :app/routes  {}}

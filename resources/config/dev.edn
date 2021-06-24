@@ -1,3 +1,9 @@
 {:http/server {:handler #ig/ref :app/routes
-               :port #or [#env PORT 6969]}
- :app/routes  {}}
+               :port    #or [#env SERVER_PORT 6969]}
+ :app/routes  {}
+ :crux/db {:port #or [#env CRUX_PORT 7000]
+           :jdbc {:host     #or [#env POSTGRES_HOST "localhost"]
+                  :port     #long #or [#env POSTGRES_PORT 5432]
+                  :dbname   #or [#env POSTGRES_DB "app_db"]
+                  :user     #or [#env POSTGRES_USER "postgres"]
+                  :password #or [#env POSTGRES_PASSWORD "postgres"]}}}
