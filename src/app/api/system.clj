@@ -2,7 +2,7 @@
   (:require [aero.core :as aero]
             [integrant.core :as ig]
             [org.httpkit.server :as http]
-            [app.api.routes :refer [routes]]))
+            [app.api.routes :refer [create-routes]]))
 
 (defmethod aero/reader 'ig/ref
   [_ _ value]
@@ -24,4 +24,4 @@
 (defmethod ig/init-key :app/routes
   [_ _]
   (println "Initializing application")
-  (routes))
+  (create-routes))
