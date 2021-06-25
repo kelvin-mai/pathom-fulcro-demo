@@ -1,5 +1,8 @@
 .cpcache/
+.clj-kondo/.cache/
 .lsp/
 node_modules/
 .shadow-cljs/
 resources/config/prod.edn
+resources/public/js/
+resources/public/css/
