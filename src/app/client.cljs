@@ -1,7 +1,6 @@
 (ns app.client
   (:require [com.fulcrologic.fulcro.application :as app]
             [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
-            [com.fulcrologic.fulcro.dom :as dom]
             [app.client.app :refer [APP]]
             [app.client.ui.root :refer [Root]]))
 
