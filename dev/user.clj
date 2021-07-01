@@ -21,12 +21,34 @@
                              :handler cider-nrepl-handler)
   (go))
 
-(def db (:crux/db state/system))
-
 (comment
   (go)
   (halt)
   (reset)
   (reset-all)
 
-  state/system)
+  state/system
+  ;; expose system components for repl use
+  (def db (:crux/db state/system))
+  (def parser (:pathom/parser state/system))
+
+  (parser {:db db}
+          [{[:product/id 2]
+            [:product/id
+             :product/name
+             :product/price]}])
+
+  (parser {:db db}
+          #_[{:products [:product/id]}]
+          [{:products {:product/id [:product/id
+                                    :product/name
+                                    :product/price]}}]
+          )
+
+  (parser {:db db}
+          '[{(create-product {:product/name "new product"
+                               :product/price 22.5}) 
+             [:success
+              :product/id]}])
+  ;
+  )

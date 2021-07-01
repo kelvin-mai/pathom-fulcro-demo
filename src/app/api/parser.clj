@@ -4,7 +4,11 @@
             [clojure.core.async :refer [<!!]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.viz.ws-connector.core :as p.viz]))
+            [com.wsscode.pathom.viz.ws-connector.core :as p.viz]
+            [app.api.resolvers.products :as products]))
+
+(def registry [(pc/constantly-resolver :ok "OK")
+               products/resolvers])
 
 (defn preprocess-parser-plugin
   [f]
@@ -20,11 +24,10 @@
   (log/debug "pathom transaction" (pr-str tx))
   req)
 
-(def registry [(pc/constantly-resolver :ok "OK")])
-
 (defn create-parser [db]
   (p/parallel-parser
    {::p/env {::p/reader                [p/map-reader
+                                        pc/reader2
                                         pc/parallel-reader
                                         pc/open-ident-reader
                                         p/env-placeholder-reader]
