@@ -21,6 +21,8 @@
                              :handler cider-nrepl-handler)
   (go))
 
+(def db (:crux/db state/system))
+
 (comment
   (go)
   (halt)
