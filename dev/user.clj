@@ -21,6 +21,10 @@
                              :handler cider-nrepl-handler)
   (go))
 
+;; expose system components for repl use
+(def db (:crux/db state/system))
+(def parser (:pathom/parser state/system))
+
 (comment
   (go)
   (halt)
@@ -28,27 +32,37 @@
   (reset-all)
 
   state/system
-  ;; expose system components for repl use
-  (def db (:crux/db state/system))
-  (def parser (:pathom/parser state/system))
+
+  (app.utils.db/get-all-idents db :product/id)
+  (app.utils.db/get-entity db :product/id #uuid "0a2d1fc5-de79-4c3d-9ab7-781c0bc27dec")
+  (app.utils.db/entity db #uuid "0a2d1fc5-de79-4c3d-9ab7-781c0bc27dec")
+  (crux.api/submit-tx db
+                      [[:crux.tx/put
+                        {:crux.db/id 1
+                         :product/id 1
+                         :product/name "new product"
+                         :product/price 22.5}]])
 
   (parser {:db db}
-          [{[:product/id 2]
+          [:products/all])
+
+  (parser {:db db}
+          [{[:product/id #uuid "0a2d1fc5-de79-4c3d-9ab7-781c0bc27dec"]
             [:product/id
              :product/name
              :product/price]}])
 
   (parser {:db db}
-          #_[{:products [:product/id]}]
-          [{:products {:product/id [:product/id
-                                    :product/name
-                                    :product/price]}}]
-          )
+          [{:products/all [:product/id
+                           :product/name
+                           :product/price]}])
 
   (parser {:db db}
           '[{(create-product {:product/name "new product"
-                               :product/price 22.5}) 
-             [:success
-              :product/id]}])
+                              :product/price 22.5})
+             [:transaction/success
+              :product/id
+              :product/name
+              :product/price]}])
   ;
   )

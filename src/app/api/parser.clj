@@ -3,11 +3,17 @@
             [integrant.core :as ig]
             [clojure.core.async :refer [<!!]]
             [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.connect :as pc]
+            [com.wsscode.pathom.connect :as pc :refer [defresolver]]
             [com.wsscode.pathom.viz.ws-connector.core :as p.viz]
             [app.api.resolvers.products :as products]))
 
+(defresolver index-explorer [env _]
+  {::pc/input #{:com.wsscode.pathom.viz.index-explorer/id}
+   ::pc/output [:com.wsscode.pathom.viz.index-explorer/index]}
+  {:com.wsscode.pathom.viz.index-explorer/index (get env ::pc/indexes)})
+
 (def registry [(pc/constantly-resolver :ok "OK")
+               index-explorer
                products/resolvers])
 
 (defn preprocess-parser-plugin
@@ -20,6 +26,10 @@
            (parser env tx)
            {}))))})
 
+(defn process-error [env err]
+  (log/error (.getMessage err))
+  (ex-data err))
+
 (defn log-requests [{:keys [env tx] :as req}]
   (log/debug "pathom transaction" (pr-str tx))
   req)
@@ -31,7 +41,8 @@
                                         pc/parallel-reader
                                         pc/open-ident-reader
                                         p/env-placeholder-reader]
-             ::p/placeholder-prefixes #{">"}}
+             ::p/placeholder-prefixes #{">"}
+             ::p/process-error process-error}
     ::p/mutate pc/mutate-async
     ::p/plugins [(pc/connect-plugin {::pc/register registry})
                  (p/env-wrap-plugin (fn [env]
