@@ -26,17 +26,17 @@
 
 (defmutation create-inventory-mutation
   [{:keys [db]} params]
-  {::pc/sym 'create-inventory
+  {::pc/sym `mutation/create-inventory
    ::pc/params inventory/attrs
    ::pc/output [:transaction/success :inventory/id]}
-  (let [{:product/keys [id] :as entity} (db/new-entity :inventory/id params)
+  (let [{:inventory/keys [id] :as entity} (db/new-entity :inventory/id params)
         tx-status (db/submit! db [[:crux.tx/put entity]])]
     {:transaction/success tx-status
      :inventory/id id}))
 
 (defmutation update-inventory-quantity-mutation
   [{:keys [db]} {:inventory/keys [id quantity]}]
-  {::pc/sym 'update-inventory-quantity
+  {::pc/sym `mutation/update-inventory-quantity
    ::pc/params [:inventory/id :inventory/quantity]
    ::pc/output [:transaction/success :inventory/id]}
   (let [{:inventory/keys [id] :as entity} (db/get-entity db :inventory/id id)

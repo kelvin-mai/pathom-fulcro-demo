@@ -16,7 +16,7 @@
 
 (defmutation create-product-mutation
   [{:keys [db]} params]
-  {::pc/sym 'create-product
+  {::pc/sym `mutation/create-product
    ::pc/params product/attrs
    ::pc/output [:transaction/success :product/id]}
   (let [{:product/keys [id] :as entity} (db/new-entity :product/id params)
