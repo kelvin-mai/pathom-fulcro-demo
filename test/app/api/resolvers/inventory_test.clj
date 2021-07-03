@@ -22,8 +22,9 @@
          db :crux/db} @test-system
         parse #(parser {:db db} %)
         product (mock-product parse)
+        product-id (:product/id product)
         query `[{(mutation/create-inventory {:inventory/quantity 69
-                                             :inventory/product {:product/id (:product/id ~product)}})
+                                             :inventory/product {:product/id ~product-id}})
                  [:transaction/success
                   :inventory/id
                   :inventory/quantity
@@ -40,7 +41,7 @@
       (is (= 69
              (:inventory/quantity result)))
       (is (= product
-             (last (get-in result [:inventory/product :product/id]))))
+             (:inventory/product result)))
       (is (= 1
              (count (:inventory/history result)))))
 
@@ -59,6 +60,34 @@
         (is (= 69
                (:inventory/quantity result)))
         (is (= product
-               (last (get-in result [:inventory/product :product/id]))))
+               (:inventory/product result)))
         (is (= 1
-               (count (:inventory/history result))))))))
+               (count (:inventory/history result))))))
+
+    (testing "can update inventory quantity"
+      (let [transaction-query `[(mutation/update-inventory-quantity {:inventory/id ~test-id
+                                                                     :inventory/quantity 100})
+                                [:transaction/success
+                                 :inventory/id]]
+            parsed (parse transaction-query)
+            transaction-result (get parsed `mutation/update-inventory-quantity)
+            _ "mutations that updates entities in the existing graph doesnt seem to populate"
+            result-query [{[:inventory/id test-id]
+                           [:inventory/id
+                            :inventory/quantity
+                            :inventory/history
+                            {:inventory/product [:product/id
+                                                 :product/name
+                                                 :product/price]}]}]
+            parsed (parse result-query)
+            real-result (get parsed [:inventory/id test-id])]
+        (is (= true
+               (:transaction/success transaction-result)))
+        (is (= test-id
+               (:inventory/id transaction-result)))
+        (is (= 100
+                 (:inventory/quantity real-result)))
+        (is (= product
+                 (:inventory/product real-result)))
+        (is (= 2
+                 (count (:inventory/history real-result))))))))

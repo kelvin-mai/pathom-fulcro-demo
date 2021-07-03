@@ -1,6 +1,7 @@
 (ns user
-  (:require [integrant.core :as ig]
-            [integrant.repl :as ig-repl :refer [go halt reset reset-all]]
+  (:require [clojure.tools.namespace.repl :as tools-ns]
+            [integrant.core :as ig]
+            [integrant.repl :as ig-repl :refer [go halt]]
             [integrant.repl.state :as state]
             [nrepl.server]
             [cider.nrepl :refer [cider-nrepl-handler]]
@@ -9,6 +10,14 @@
 (ig-repl/set-prep!
  (fn []
    (system/read-config-file "resources/config/dev.edn")))
+
+(declare db parser)
+(defn start-interactive 
+  "Start and expose system components for repl use"
+  []
+  (go)
+  (def db (:crux/db state/system))
+  (def parser (:pathom/parser state/system)))
 
 (defn start-dev
   "
@@ -19,18 +28,17 @@
   (nrepl.server/start-server :port 1234
                              :bind "0.0.0.0"
                              :handler cider-nrepl-handler)
-  (go))
+  (start-interactive))
 
-;; expose system components for repl use
-(def db (:crux/db state/system))
-(def parser (:pathom/parser state/system))
+(defn restart 
+  "Stop system, reload code, and restart in interactive mode"
+  []
+  (halt)
+  (tools-ns/refresh :after 'user/start-interactive))
 
 (comment
-  (go)
   (halt)
-  (reset)
-  (reset-all)
-
+  (restart)
   state/system
   ;
   )
