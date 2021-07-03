@@ -6,22 +6,20 @@
 (defresolver products-resolver
   [{:keys [db]} _]
   {::pc/output [{:products/all [:product/id]}]}
-  (let [idents (db/get-all-idents db :product/id)]
-    {:products/all idents}))
+  {:products/all (db/get-all-idents db :product/id)})
 
 (defresolver product-resolver
   [{:keys [db]} {:product/keys [id]}]
   {::pc/input #{:product/id}
    ::pc/output product/attrs}
-  (let [entity (db/get-entity db :product/id id)] 
-    (db/entity? entity id)))
+  (db/get-entity db :product/id id))
 
 (defmutation create-product-mutation
-  [{:keys [db]} product]
+  [{:keys [db]} params]
   {::pc/sym 'create-product
    ::pc/params product/attrs
    ::pc/output [:transaction/success :product/id]}
-  (let [{:product/keys [id] :as entity} (db/new-entity :product/id product)
+  (let [{:product/keys [id] :as entity} (db/new-entity :product/id params)
         tx-status (db/submit! db [[:crux.tx/put entity]])]
     {:transaction/success tx-status
      :product/id id}))

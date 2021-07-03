@@ -13,19 +13,17 @@
 (defn entity [node id]
   (crux/entity (crux/db node) id))
 
+(defn entity-history
+  ([node id]
+   (entity-history node id :desc))
+  ([node id sort-order]
+   (crux/entity-history (crux/db node) id sort-order {:with-docs? true})))
+
 (defn new-entity [ident entity]
   (let [eid (UUID/randomUUID)]
     (merge {:crux.db/id eid
             ident eid}
            entity)))
-
-(defn entity? [entity id]
-  (if entity
-    entity
-    (throw
-     (ex-info "entity does not exists"
-              {:error/message "entity does not exist"
-               :entity/id id}))))
 
 (defn ids->idents [ident ids]
   (map
@@ -41,5 +39,11 @@
 (defn get-entity [node ident id]
   (let [eid (q node `{:find [?e]
                       :where [[?e ~ident ~id]]})
-        eid (ffirst eid)]
-    (crux/entity (crux/db node) eid)))
+        eid (ffirst eid)
+        entity (entity node eid)]
+    (if entity
+      entity
+      (throw
+       (ex-info "entity does not exists"
+                {:error/message "entity does not exist"
+                 :entity/id id})))))

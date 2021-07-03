@@ -5,7 +5,8 @@
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc :refer [defresolver]]
             [com.wsscode.pathom.viz.ws-connector.core :as p.viz]
-            [app.api.resolvers.products :as products]))
+            [app.api.resolvers.products :as products]
+            [app.api.resolvers.inventory :as inventory]))
 
 (defresolver index-explorer [env _]
   {::pc/input #{:com.wsscode.pathom.viz.index-explorer/id}
@@ -14,7 +15,8 @@
 
 (def registry [(pc/constantly-resolver :ok "OK")
                index-explorer
-               products/resolvers])
+               products/resolvers
+               inventory/resolvers])
 
 (defn preprocess-parser-plugin
   [f]

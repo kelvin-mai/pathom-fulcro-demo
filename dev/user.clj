@@ -33,29 +33,34 @@
 
   state/system
 
-  (app.utils.db/get-all-idents db :product/id)
-  (app.utils.db/get-entity db :product/id #uuid "0a2d1fc5-de79-4c3d-9ab7-781c0bc27dec")
-  (app.utils.db/entity db #uuid "0a2d1fc5-de79-4c3d-9ab7-781c0bc27dec")
   (crux.api/submit-tx db
                       [[:crux.tx/put
-                        {:crux.db/id 1
-                         :product/id 1
+                        {:crux.db/id #uuid "0a2d1fc5-de79-4c3d-9ab7-781c0bc27dec"
+                         :product/id #uuid "0a2d1fc5-de79-4c3d-9ab7-781c0bc27dec"
                          :product/name "new product"
                          :product/price 22.5}]])
 
-  (parser {:db db}
-          [:products/all])
-
-  (parser {:db db}
-          [{[:product/id #uuid "0a2d1fc5-de79-4c3d-9ab7-781c0bc27dec"]
-            [:product/id
-             :product/name
-             :product/price]}])
+  (crux.api/submit-tx db
+                      [[:crux.tx/put
+                        {:crux.db/id #uuid "9583a09f-d761-41cb-93b8-11648da1f823"
+                         :inventory/id #uuid "9583a09f-d761-41cb-93b8-11648da1f823"
+                         :inventory/quantity 90
+                         :inventory/product
+                         {:product/id #uuid "0a2d1fc5-de79-4c3d-9ab7-781c0bc27dec"}}
+                        nil]])
 
   (parser {:db db}
           [{:products/all [:product/id
                            :product/name
                            :product/price]}])
+
+  (parser {:db db}
+          [{:inventory/all [:inventory/id
+                            :inventory/quantity
+                            :inventory/history
+                            {:inventory/product [:product/id
+                                                 :product/name
+                                                 :product/price]}]}])
 
   (parser {:db db}
           '[{(create-product {:product/name "new product"
@@ -64,5 +69,15 @@
               :product/id
               :product/name
               :product/price]}])
+
+  (parser {:db db}
+          '[{(update-inventory-quantity {:inventory/id #uuid "9583a09f-d761-41cb-93b8-11648da1f823"
+                                         :inventory/quantity 200})
+             [:transaction/success
+              :inventory/id
+              :inventory/quantity
+              {:inventory/product [:product/id
+                                   :product/name
+                                   :product/price]}]}])
   ;
   )
