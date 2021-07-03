@@ -39,7 +39,6 @@
 (defn create-parser [db]
   (p/parallel-parser
    {::p/env {::p/reader                [p/map-reader
-                                        pc/reader2
                                         pc/parallel-reader
                                         pc/open-ident-reader
                                         p/env-placeholder-reader]

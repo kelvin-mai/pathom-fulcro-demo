@@ -39,11 +39,5 @@
 (defn get-entity [node ident id]
   (let [eid (q node `{:find [?e]
                       :where [[?e ~ident ~id]]})
-        eid (ffirst eid)
-        entity (entity node eid)]
-    (if entity
-      entity
-      (throw
-       (ex-info "entity does not exists"
-                {:error/message "entity does not exist"
-                 :entity/id id})))))
+        eid (ffirst eid)]
+    (entity node eid)))
