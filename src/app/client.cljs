@@ -1,5 +1,7 @@
 (ns app.client
-  (:require [com.fulcrologic.fulcro.application :as app]
+  (:require [taoensso.timbre :as log]
+            [com.fulcrologic.fulcro.application :as app]
+            [com.fulcrologic.fulcro.inspect.inspect-client :as inspect]
             [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
             [app.client.app :refer [APP]]
             [app.client.ui.root :refer [Root]]))
@@ -10,5 +12,6 @@
   (js/console.log "reloaded"))
 
 (defn ^:export init []
-  (app/mount! APP Root "app")
-  (js/console.log "starting"))
+  (log/info "application starting")
+  (inspect/app-started! APP)
+  (app/mount! APP Root "app"))

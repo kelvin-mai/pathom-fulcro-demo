@@ -3,19 +3,12 @@
             [integrant.core :as ig]
             [clojure.core.async :refer [<!!]]
             [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.connect :as pc :refer [defresolver]]
+            [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.viz.ws-connector.core :as p.viz]
             [app.api.resolvers.products :as products]
             [app.api.resolvers.inventory :as inventory]))
 
-(defresolver index-explorer [env _]
-  {::pc/input #{:com.wsscode.pathom.viz.index-explorer/id}
-   ::pc/output [:com.wsscode.pathom.viz.index-explorer/index]}
-  {:com.wsscode.pathom.viz.index-explorer/index (get env ::pc/indexes)})
-
-(def registry [(pc/constantly-resolver :ok "OK")
-               index-explorer
-               products/resolvers
+(def registry [products/resolvers
                inventory/resolvers])
 
 (defn preprocess-parser-plugin
