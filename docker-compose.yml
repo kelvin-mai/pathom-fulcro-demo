@@ -8,8 +8,8 @@ services:
        POSTGRES_DB: app_db
        POSTGRES_USER: postgres
        POSTGRES_PASSWORD: postgres
-     # volumes:
-     #   - ./sql/:/docker-entrypoint-initdb.d/
+     volumes:
+       - ./sql/:/docker-entrypoint-initdb.d/
      ports:
        - 5432:5432
      healthcheck:

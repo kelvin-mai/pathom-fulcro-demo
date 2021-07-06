@@ -1,7 +1,8 @@
 (ns app.api.resolvers.inventory
   (:require [com.wsscode.pathom.connect :as pc :refer [defresolver defmutation]]
             [app.utils.db :as db]
-            [app.api.models.inventory :as inventory]))
+            [app.utils.models :as models]
+            [app.models.inventory :as inventory]))
 
 (defresolver all-inventory-resolver
   [{:keys [db]} _]
@@ -29,16 +30,18 @@
   {::pc/sym `mutation/create-inventory
    ::pc/params inventory/attrs
    ::pc/output [:transaction/success :inventory/id]}
+  (models/validate ::inventory/create params)
   (let [{:inventory/keys [id] :as entity} (db/new-entity :inventory/id params)
         tx-status (db/submit! db [[:crux.tx/put entity]])]
     {:transaction/success tx-status
      :inventory/id id}))
 
 (defmutation update-inventory-quantity-mutation
-  [{:keys [db]} {:inventory/keys [id quantity]}]
+  [{:keys [db]} {:inventory/keys [id quantity] :as params}]
   {::pc/sym `mutation/update-inventory-quantity
    ::pc/params [:inventory/id :inventory/quantity]
    ::pc/output [:transaction/success :inventory/id]}
+  (models/validate ::inventory/update-quantity params)
   (let [{:inventory/keys [id] :as entity} (db/get-entity db :inventory/id id)
         entity (assoc entity :inventory/quantity quantity)
         tx-status (db/submit! db [[:crux.tx/put entity]])]

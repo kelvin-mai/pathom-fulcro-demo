@@ -23,10 +23,12 @@
         parse #(parser {:db db} %)
         product (mock-product parse)
         product-id (:product/id product)
-        query `[{(mutation/create-inventory {:inventory/quantity 69
+        query `[{(mutation/create-inventory {:inventory/name "test inventory"
+                                             :inventory/quantity 69
                                              :inventory/product {:product/id ~product-id}})
                  [:transaction/success
                   :inventory/id
+                  :inventory/name
                   :inventory/quantity
                   :inventory/history
                   {:inventory/product [:product/id
@@ -38,6 +40,8 @@
     (testing "can create inventory"
       (is (= true
              (:transaction/success result)))
+      (is (= "test inventory"
+             (:inventory/name result)))
       (is (= 69
              (:inventory/quantity result)))
       (is (= product
@@ -48,6 +52,7 @@
     (testing "can query created inventory"
       (let [query [{[:inventory/id test-id]
                     [:inventory/id
+                     :inventory/name
                      :inventory/quantity
                      :inventory/history
                      {:inventory/product [:product/id
@@ -57,6 +62,8 @@
             result (get parsed [:inventory/id test-id])]
         (is (= test-id
                (:inventory/id result)))
+        (is (= "test inventory"
+               (:inventory/name result)))
         (is (= 69
                (:inventory/quantity result)))
         (is (= product
@@ -65,29 +72,27 @@
                (count (:inventory/history result))))))
 
     (testing "can update inventory quantity"
-      (let [transaction-query `[(mutation/update-inventory-quantity {:inventory/id ~test-id
-                                                                     :inventory/quantity 100})
-                                [:transaction/success
-                                 :inventory/id]]
+      (let [transaction-query `[{(mutation/update-inventory-quantity {:inventory/id ~test-id
+                                                                      :inventory/quantity 100})
+                                 [:transaction/success
+                                  :inventory/id
+                                  :inventory/name
+                                  :inventory/quantity
+                                  :inventory/history
+                                  {:inventory/product [:product/id
+                                                       :product/name
+                                                       :product/price]}]}]
             parsed (parse transaction-query)
-            transaction-result (get parsed `mutation/update-inventory-quantity)
-            _ "mutations that updates entities in the existing graph doesnt seem to populate"
-            result-query [{[:inventory/id test-id]
-                           [:inventory/id
-                            :inventory/quantity
-                            :inventory/history
-                            {:inventory/product [:product/id
-                                                 :product/name
-                                                 :product/price]}]}]
-            parsed (parse result-query)
-            real-result (get parsed [:inventory/id test-id])]
+            result (get parsed `mutation/update-inventory-quantity)]
         (is (= true
-               (:transaction/success transaction-result)))
+               (:transaction/success result)))
         (is (= test-id
-               (:inventory/id transaction-result)))
+               (:inventory/id result)))
+        (is (= "test inventory"
+               (:inventory/name result)))
         (is (= 100
-                 (:inventory/quantity real-result)))
+               (:inventory/quantity result)))
         (is (= product
-                 (:inventory/product real-result)))
+               (:inventory/product result)))
         (is (= 2
-                 (count (:inventory/history real-result))))))))
+               (count (:inventory/history result))))))))

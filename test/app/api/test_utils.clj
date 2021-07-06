@@ -8,7 +8,7 @@
   []
   (fn [test-fn]
     (reset! test-system
-            (let [ig-config (system/read-config-file "resources/config/dev.edn")]
+            (let [ig-config (system/read-config-file "resources/config/test.edn")]
               (ig/init ig-config)))
     (test-fn)
     (ig/halt! @test-system)

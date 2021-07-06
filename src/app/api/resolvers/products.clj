@@ -1,7 +1,8 @@
 (ns app.api.resolvers.products
   (:require [com.wsscode.pathom.connect :as pc :refer [defresolver defmutation]]
             [app.utils.db :as db]
-            [app.api.models.product :as product]))
+            [app.utils.models :as models]
+            [app.models.product :as product]))
 
 (defresolver products-resolver
   [{:keys [db]} _]
@@ -19,6 +20,7 @@
   {::pc/sym `mutation/create-product
    ::pc/params product/attrs
    ::pc/output [:transaction/success :product/id]}
+  (models/validate ::product/create params)
   (let [{:product/keys [id] :as entity} (db/new-entity :product/id params)
         tx-status (db/submit! db [[:crux.tx/put entity]])]
     {:transaction/success tx-status
