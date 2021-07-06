@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "css": "postcss ./src/app/client/styles.css -o ./resources/public/css/style.css --verbose -w",
     "start": "shadow-cljs watch :main"
   },
   "dependencies": {
@@ -11,5 +12,11 @@
     "react-dom": "^17.0.2",
     "shadow-cljs": "^2.14.3"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "autoprefixer": "^10.2.6",
+    "cssnano": "^5.0.6",
+    "postcss": "^8.3.5",
+    "postcss-cli": "^8.3.1",
+    "tailwindcss": "^2.2.4"
+  }
 }
