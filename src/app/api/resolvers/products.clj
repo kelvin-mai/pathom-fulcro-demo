@@ -12,19 +12,20 @@
 (defresolver product-resolver
   [{:keys [db]} {:product/keys [id]}]
   {::pc/input #{:product/id}
-   ::pc/output product/attrs}
+   ::pc/output [:product/name :product/price]}
   (db/get-entity db :product/id id))
 
 (defmutation create-product-mutation
-  [{:keys [db]} params]
+  [{:keys [db]} {temp-id :product/id :as params}]
   {::pc/sym `mutation/create-product
-   ::pc/params product/attrs
+   ::pc/params [:product/name :product/price]
    ::pc/output [:transaction/success :product/id]}
   (models/validate ::product/create params)
   (let [{:product/keys [id] :as entity} (db/new-entity :product/id params)
         tx-status (db/submit! db [[:crux.tx/put entity]])]
     {:transaction/success tx-status
-     :product/id id}))
+     :product/id id
+     :tempids {temp-id id}}))
 
 (def resolvers [products-resolver
                 product-resolver

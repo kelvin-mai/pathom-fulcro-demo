@@ -3,12 +3,21 @@
             [integrant.core :as ig]
             [clojure.core.async :refer [<!!]]
             [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.connect :as pc]
+            [com.wsscode.pathom.connect :as pc :refer [defresolver]]
             [com.wsscode.pathom.viz.ws-connector.core :as p.viz]
             [app.api.resolvers.products :as products]
             [app.api.resolvers.inventory :as inventory]))
 
-(def registry [products/resolvers
+(defresolver index-explorer [env _]
+  {::pc/input  #{:com.wsscode.pathom.viz.index-explorer/id}
+   ::pc/output [:com.wsscode.pathom.viz.index-explorer/index]}
+  {:com.wsscode.pathom.viz.index-explorer/index
+   (-> (get env ::pc/indexes)
+     (update ::pc/index-resolvers #(into {} (map (fn [[k v]] [k (dissoc v ::pc/resolve)])) %))
+     (update ::pc/index-mutations #(into {} (map (fn [[k v]] [k (dissoc v ::pc/mutate)])) %)))})
+
+(def registry [index-explorer
+               products/resolvers
                inventory/resolvers])
 
 (defn preprocess-parser-plugin
@@ -36,6 +45,7 @@
                                         pc/open-ident-reader
                                         p/env-placeholder-reader]
              ::p/placeholder-prefixes #{">"}
+             ::pc/mutation-join-globals [:tempids]
              ::p/process-error process-error}
     ::p/mutate pc/mutate-async
     ::p/plugins [(pc/connect-plugin {::pc/register registry})

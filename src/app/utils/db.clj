@@ -23,12 +23,12 @@
   (let [eid (UUID/randomUUID)]
     (merge {:crux.db/id eid
             ident eid}
-           entity)))
+           (dissoc entity ident))))
 
 (defn ids->idents [ident ids]
   (map
    (fn [[id]]
-     [ident id])
+     {ident id})
    ids))
 
 (defn get-all-idents [node ident]
