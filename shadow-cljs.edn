@@ -1,5 +1,6 @@
 {:deps     {:aliases [:dev]}
- :nrepl    {:port 9000}
+ :nrepl    {:port 9000
+            :host "0.0.0.0"}
 
  :dev-http {8000 "resources/public"}
 

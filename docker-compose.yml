@@ -1,19 +1,47 @@
 version: '3.2'
 
 services:
-   db:
-     container_name: db
-     image: postgres
-     environment:
-       POSTGRES_DB: app_db
-       POSTGRES_USER: postgres
-       POSTGRES_PASSWORD: postgres
-     volumes:
-       - ./sql/:/docker-entrypoint-initdb.d/
-     ports:
-       - 5432:5432
-     healthcheck:
-       test: ["CMD-SHELL", "pg_isready -U postgres"]
-       interval: 10s
-       timeout: 5s
-       retries: 5
+  db:
+    container_name: db
+    image: postgres
+    environment:
+      POSTGRES_DB: app_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./sql/:/docker-entrypoint-initdb.d/
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  server:
+    container_name: server
+    build: 
+      context: .
+      dockerfile: ./docker/dev/Dockerfile.api
+    ports:
+      - 1234:1234 # repl
+      - 6969:6969 # api
+      - 7000:7000 # crux
+    volumes:
+      - ./src/:/app/src/:cached
+      - ./resources/:/app/resources/:cached
+    environment: 
+      POSTGRES_HOST: db
+    depends_on: 
+      db:
+        condition: service_healthy
+
+  client:
+    container_name: client
+    build:
+      context: .
+      dockerfile: ./docker/dev/Dockerfile.client
+    ports:
+      - 9630:9630 # build server
+      - 9000:9000 # repl
+      - 8000:8000 # dev server

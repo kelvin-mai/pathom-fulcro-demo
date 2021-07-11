@@ -1,0 +1,4 @@
+FROM clojure:tools-deps
+ADD . /app
+WORKDIR /app
+ENTRYPOINT ["clj","-X:dev"]
