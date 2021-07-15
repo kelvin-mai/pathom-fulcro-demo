@@ -25,10 +25,9 @@
 
 (defsc Product
   [this props]
-  {:query (fn [_] [:product/id :product/name :product/price])
+  {:query [:product/id :product/name :product/price]
    :ident :product/id}
   (dom/div
-
    (pr-str props)))
 
 (def ui-product (comp/factory Product {:keyfn :product/id}))

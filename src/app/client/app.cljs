@@ -2,7 +2,8 @@
   (:require [com.fulcrologic.fulcro.application :as app]
             [com.fulcrologic.fulcro.data-fetch :as df]
             [com.fulcrologic.fulcro.networking.http-remote :as http]
-            [app.client.ui.products :refer [Product]]))
+            [app.client.ui.products :refer [Product]]
+            [app.client.ui.inventory :refer [Inventory]]))
 
 (defonce APP
   (app/fulcro-app
@@ -12,4 +13,7 @@
     (fn [app]
       (df/load! app :products/all
                 Product
-                {:target [:component/id :products :products]}))}))
+                {:target [:component/id :products :products]})
+      (df/load! APP :inventory/all
+                Inventory
+                {:target [:component/id :inventories :inventories]}))}))

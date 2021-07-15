@@ -41,6 +41,9 @@ services:
     build:
       context: .
       dockerfile: ./docker/dev/Dockerfile.client
+    volumes:
+      - ./src/:/app/src/:cached
+      - ./resources/:/app/resources/:cached
     ports:
       - 9630:9630 # build server
       - 9000:9000 # repl

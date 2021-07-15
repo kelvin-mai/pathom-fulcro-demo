@@ -12,12 +12,14 @@
    (system/read-config-file "resources/config/dev.edn")))
 
 (declare db parser)
-(defn start-interactive 
+
+(defn start-interactive
   "Start and expose system components for repl use"
   []
   (go)
   (def db (:crux/db state/system))
-  (def parser (:pathom/parser state/system)))
+  (def parser (:pathom/parser state/system))
+  :dev/ready)
 
 (defn start-dev
   "
@@ -30,7 +32,7 @@
                              :handler cider-nrepl-handler)
   (start-interactive))
 
-(defn restart 
+(defn restart
   "Stop system, reload code, and restart in interactive mode"
   []
   (halt)
