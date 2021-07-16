@@ -14,7 +14,8 @@
                   :product/name
                   :product/price]}]
         parsed (wrapped-parser query)
-        result (get parsed `mutation/create-product)]
+        result (get parsed `mutation/create-product)
+        result (dissoc result :tempids)]
     result))
 
 (deftest inventory-test
@@ -25,7 +26,7 @@
         product-id (:product/id product)
         query `[{(mutation/create-inventory {:inventory/name "test inventory"
                                              :inventory/quantity 69
-                                             :inventory/product {:product/id ~product-id}})
+                                             :inventory/product ~product-id})
                  [:transaction/success
                   :inventory/id
                   :inventory/name

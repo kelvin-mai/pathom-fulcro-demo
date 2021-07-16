@@ -1,9 +1,9 @@
 (ns app.models.product
   (:require [clojure.spec.alpha :as s]
-            [app.utils.models :refer [non-blank-string?]]))
+            [app.utils.models :as m]))
 
-#_(s/def :product/id (complement nil?))
-(s/def :product/name non-blank-string?)
+(s/def :product/id m/uuid-or-tempid?)
+(s/def :product/name m/non-blank-string?)
 (s/def :product/price pos?)
 
 (s/def ::create

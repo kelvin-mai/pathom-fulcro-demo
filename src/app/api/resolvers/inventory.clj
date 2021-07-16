@@ -7,13 +7,14 @@
 (defresolver all-inventory-resolver
   [{:keys [db]} _]
   {::pc/output [{:inventory/all [:inventory/id]}]}
-  {:inventory/all (db/get-all-idents db :inventory/id)})
+  {:inventory/all (db/get-all-idents db :inventory)})
 
 (defresolver inventory-resolver
   [{:keys [db]} {:inventory/keys [id]}]
   {::pc/input #{:inventory/id}
    ::pc/output [:inventory/name :inventory/quantity :inventory/product]}
-  (db/get-entity db :inventory/id id))
+  (let [entity (db/get-entity db :inventory id)]
+    (models/resolve-model :inventory entity)))
 
 (defresolver inventory-history-resolver
   [{:keys [db]} {:inventory/keys [id]}]
@@ -31,7 +32,7 @@
    ::pc/params [:inventory/id :inventory/name :inventory/quantity :inventory/product]
    ::pc/output [:transaction/success :inventory/id]}
   (models/validate ::inventory/create params)
-  (let [{:inventory/keys [id] :as entity} (db/new-entity :inventory/id params)
+  (let [{:inventory/keys [id] :as entity} (db/new-entity :inventory params)
         tx-status (db/submit! db [[:crux.tx/put entity]])]
     {:transaction/success tx-status
      :inventory/id id
@@ -43,7 +44,7 @@
    ::pc/params [:inventory/id :inventory/quantity]
    ::pc/output [:transaction/success :inventory/id]}
   (models/validate ::inventory/update-quantity params)
-  (let [{:inventory/keys [id] :as entity} (db/get-entity db :inventory/id id)
+  (let [{:inventory/keys [id] :as entity} (db/get-entity db :inventory id)
         entity (assoc entity :inventory/quantity quantity)
         tx-status (db/submit! db [[:crux.tx/put entity]])]
     {:transaction/success tx-status

@@ -7,13 +7,14 @@
 (defresolver products-resolver
   [{:keys [db]} _]
   {::pc/output [{:products/all [:product/id]}]}
-  {:products/all (db/get-all-idents db :product/id)})
+  {:products/all (db/get-all-idents db :product)})
 
 (defresolver product-resolver
   [{:keys [db]} {:product/keys [id]}]
   {::pc/input #{:product/id}
    ::pc/output [:product/name :product/price]}
-  (db/get-entity db :product/id id))
+  (let [entity (db/get-entity db :product id)]
+    (models/resolve-model :product entity)))
 
 (defmutation create-product-mutation
   [{:keys [db]} {temp-id :product/id :as params}]
@@ -21,7 +22,7 @@
    ::pc/params [:product/name :product/price]
    ::pc/output [:transaction/success :product/id]}
   (models/validate ::product/create params)
-  (let [{:product/keys [id] :as entity} (db/new-entity :product/id params)
+  (let [{:product/keys [id] :as entity} (db/new-entity :product params)
         tx-status (db/submit! db [[:crux.tx/put entity]])]
     {:transaction/success tx-status
      :product/id id
