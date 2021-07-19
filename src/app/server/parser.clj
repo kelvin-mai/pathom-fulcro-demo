@@ -1,24 +1,28 @@
-(ns app.api.parser
+(ns app.server.parser
   (:require [taoensso.timbre :as log]
             [integrant.core :as ig]
             [clojure.core.async :refer [<!!]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc :refer [defresolver]]
             [com.wsscode.pathom.viz.ws-connector.core :as p.viz]
-            [app.api.resolvers.products :as products]
-            [app.api.resolvers.inventory :as inventory]))
+            [app.models.product.resolvers :as product.resolvers]
+            [app.models.product.mutations :as product.mutations]
+            [app.models.inventory.resolvers :as inventory.resolvers]
+            [app.models.inventory.mutations :as inventory.mutations]))
 
 (defresolver index-explorer [env _]
   {::pc/input  #{:com.wsscode.pathom.viz.index-explorer/id}
    ::pc/output [:com.wsscode.pathom.viz.index-explorer/index]}
   {:com.wsscode.pathom.viz.index-explorer/index
    (-> (get env ::pc/indexes)
-     (update ::pc/index-resolvers #(into {} (map (fn [[k v]] [k (dissoc v ::pc/resolve)])) %))
-     (update ::pc/index-mutations #(into {} (map (fn [[k v]] [k (dissoc v ::pc/mutate)])) %)))})
+       (update ::pc/index-resolvers #(into {} (map (fn [[k v]] [k (dissoc v ::pc/resolve)])) %))
+       (update ::pc/index-mutations #(into {} (map (fn [[k v]] [k (dissoc v ::pc/mutate)])) %)))})
 
 (def registry [index-explorer
-               products/resolvers
-               inventory/resolvers])
+               product.resolvers/resolvers
+               product.mutations/mutations
+               inventory.resolvers/resolvers
+               inventory.mutations/mutations])
 
 (defn preprocess-parser-plugin
   [f]

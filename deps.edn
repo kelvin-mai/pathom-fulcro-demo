@@ -15,7 +15,7 @@
            com.fulcrologic/fulcro           {:mvn/version "3.4.22"}
            com.wsscode/pathom               {:mvn/version "2.3.2"}
            com.wsscode/pathom-viz-connector {:mvn/version "1.0.6"}}
- :aliases {:run   {:main-opts ["-m" "app.api"]}
+ :aliases {:run   {:main-opts ["-m" "app.server"]}
            :dev   {:extra-paths ["dev"]
                    :extra-deps {;; cljs deps
                                 org.clojure/clojurescript {:mvn/version "1.10.866"}
@@ -33,5 +33,5 @@
                    :exec-fn      hf.depstar/uberjar
                    :jvm-opts     ["-Dclojure.compiler.direct-linking=true"]
                    :exec-args    {:aot        true
-                                  :main-class app.api
+                                  :main-class app.server
                                   :jar        "app.jar"}}}}

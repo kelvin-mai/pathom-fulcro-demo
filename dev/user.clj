@@ -5,7 +5,7 @@
             [integrant.repl.state :as state]
             [nrepl.server]
             [cider.nrepl :refer [cider-nrepl-handler]]
-            [app.api.system :as system]))
+            [app.server.system :as system]))
 
 (ig-repl/set-prep!
  (fn []

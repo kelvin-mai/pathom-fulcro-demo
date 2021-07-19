@@ -1,8 +1,8 @@
-(ns app.client.ui.root
+(ns app.client.root
   (:require [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
             [com.fulcrologic.fulcro.dom :as dom]
-            [app.client.ui.products :refer [Products ui-products]]
-            [app.client.ui.inventory :refer [Inventories ui-inventories]]))
+            [app.models.product.ui :refer [Products ui-products]]
+            [app.models.inventory.ui :refer [Inventories ui-inventories]]))
 
 (defsc Root
   [this {:root/keys [message products inventories]}]

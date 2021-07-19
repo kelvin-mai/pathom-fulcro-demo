@@ -1,4 +1,4 @@
-(ns app.api.server
+(ns app.server.http
   (:require [taoensso.timbre :as log]
             [integrant.core :as ig]
             [org.httpkit.server :as http]))

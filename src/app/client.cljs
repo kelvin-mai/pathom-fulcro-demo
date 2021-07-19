@@ -4,7 +4,7 @@
             [com.fulcrologic.fulcro.inspect.inspect-client :as inspect]
             [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
             [app.client.app :refer [APP]]
-            [app.client.ui.root :refer [Root]]))
+            [app.client.root :refer [Root]]))
 
 (defn ^:after-load reload []
   (app/mount! APP Root "app")

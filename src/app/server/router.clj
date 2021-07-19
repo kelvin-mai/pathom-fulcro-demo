@@ -1,4 +1,4 @@
-(ns app.api.router
+(ns app.server.router
   (:require [taoensso.timbre :as log]
             [integrant.core :as ig]
             [reitit.ring :as ring]

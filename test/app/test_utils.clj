@@ -1,6 +1,6 @@
-(ns app.api.test-utils
+(ns app.test-utils
   (:require [integrant.core :as ig]
-            [app.api.system :as system]))
+            [app.server.system :as system]))
 
 (def test-system (atom nil))
 

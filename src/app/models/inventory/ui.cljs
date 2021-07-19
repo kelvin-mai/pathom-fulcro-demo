@@ -1,4 +1,4 @@
-(ns app.client.ui.inventory
+(ns app.models.inventory.ui
   (:require [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
             [com.fulcrologic.fulcro.dom :as dom]))
 

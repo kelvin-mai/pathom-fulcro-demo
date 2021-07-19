@@ -1,27 +1,9 @@
-(ns app.client.ui.products
+(ns app.models.product.ui
   (:require [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
             [com.fulcrologic.fulcro.dom :as dom]
             [com.fulcrologic.fulcro.data-fetch :as df]
             [com.fulcrologic.fulcro.algorithms.tempid :refer [tempid]]
-            [com.fulcrologic.fulcro.mutations :refer [defmutation]]
-            [com.fulcrologic.fulcro.algorithms.normalized-state :refer [swap!->]]
-            [edn-query-language.core :as eql]))
-
-(defmutation create-product
-  [{:keys [id] :as params}]
-  (action [{:keys [state ref]}]
-          (swap!-> state
-                   (assoc-in [:product/id id] params)
-                   (update-in [:component/id :products :products] conj params)))
-  (remote [env]
-          (js/console.log `remote :env env)
-          (eql/query->ast1 `[(mutation/create-product ~params)
-                             [:transaction/success
-                              :product/id]]))
-  (ok-action [env]
-             (js/console.log :create-product/ok-env env))
-  (error-action [env]
-                (js/console.log :create-product/error-env env)))
+            [app.models.product.mutations :as product.mutation]))
 
 (defsc Product
   [this props]
@@ -40,7 +22,7 @@
   (dom/div
    (dom/button {:type "button"
                 :onClick #(comp/transact! this
-                                          `[(create-product
+                                          `[(product.mutation
                                              ~{:product/id (tempid)
                                                :product/name "from ui"
                                                :product/price 20})])}

@@ -1,10 +1,10 @@
-(ns app.api.system
+(ns app.server.system
   (:require [aero.core :as aero]
             [integrant.core :as ig]
-            app.api.server
-            app.api.db
-            app.api.parser
-            app.api.router))
+            app.server.http
+            app.server.db
+            app.server.parser
+            app.server.router))
 
 (defmethod aero/reader 'ig/ref
   [_ _ value]

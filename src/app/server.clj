@@ -1,5 +1,5 @@
-(ns app.api
-  (:require [app.api.system :as system]))
+(ns app.server
+  (:require [app.server.system :as system]))
 
 (defn -main
   []

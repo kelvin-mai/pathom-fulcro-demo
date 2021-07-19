@@ -1,20 +1,22 @@
-(ns app.api.resolvers.inventory-test
+(ns app.parser.inventory-test
   (:require [clojure.test :refer [use-fixtures
                                   deftest
                                   testing
                                   is]]
-            [app.api.test-utils :refer [use-system test-system]]))
+            [app.models.product.mutations :as product.mutation]
+            [app.models.inventory.mutations :as inventory.mutation]
+            [app.test-utils :refer [use-system test-system]]))
 
 (use-fixtures :once (use-system))
 
 (defn mock-product [wrapped-parser]
-  (let [query `[{(mutation/create-product {:product/name "test"
+  (let [query `[{(product.mutation/create {:product/name "test"
                                            :product/price 22.5})
                  [:product/id
                   :product/name
                   :product/price]}]
         parsed (wrapped-parser query)
-        result (get parsed `mutation/create-product)
+        result (get parsed `product.mutation/create)
         result (dissoc result :tempids)]
     result))
 
@@ -24,7 +26,7 @@
         parse #(parser {:db db} %)
         product (mock-product parse)
         product-id (:product/id product)
-        query `[{(mutation/create-inventory {:inventory/name "test inventory"
+        query `[{(inventory.mutation/create {:inventory/name "test inventory"
                                              :inventory/quantity 69
                                              :inventory/product ~product-id})
                  [:transaction/success
@@ -36,7 +38,7 @@
                                        :product/name
                                        :product/price]}]}]
         parsed (parse query)
-        result (get parsed `mutation/create-inventory)
+        result (get parsed `inventory.mutation/create)
         test-id (:inventory/id result)]
     (testing "can create inventory"
       (is (= true
@@ -73,7 +75,7 @@
                (count (:inventory/history result))))))
 
     (testing "can update inventory quantity"
-      (let [transaction-query `[{(mutation/update-inventory-quantity {:inventory/id ~test-id
+      (let [transaction-query `[{(inventory.mutation/update-quantity {:inventory/id ~test-id
                                                                       :inventory/quantity 100})
                                  [:transaction/success
                                   :inventory/id
@@ -84,7 +86,7 @@
                                                        :product/name
                                                        :product/price]}]}]
             parsed (parse transaction-query)
-            result (get parsed `mutation/update-inventory-quantity)]
+            result (get parsed `inventory.mutation/update-quantity)]
         (is (= true
                (:transaction/success result)))
         (is (= test-id

@@ -1,7 +1,6 @@
 (ns app.models.inventory
   (:require app.models.product
             [clojure.spec.alpha :as s]
-            [app.utils.db :refer [id->ident]]
             [app.utils.models :as m]))
 
 (s/def :inventory/id m/uuid-or-tempid?)
@@ -13,13 +12,8 @@
   (s/keys :req [:inventory/name
                 :inventory/quantity
                 :inventory/product]
-          :opt [:inventory/id]))
+          :opt [::id]))
 
 (s/def ::update-quantity
   (s/keys :req [:inventory/id
                 :inventory/quantity]))
-
-(defmethod m/resolve-model :inventory
-  [_ entity]
-  (update entity :inventory/product id->ident :product/id))
-
