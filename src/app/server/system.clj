@@ -1,5 +1,6 @@
 (ns app.server.system
-  (:require [aero.core :as aero]
+  (:require [taoensso.timbre :as log]
+            [aero.core :as aero]
             [integrant.core :as ig]
             app.server.http
             app.server.db
@@ -10,5 +11,12 @@
   [_ _ value]
   (ig/ref value))
 
-(defn read-config-file [file]
-  (aero/read-config file))
+(defmethod ig/init-key :system/config
+  [_ config]
+  (log/info "system starting with config" config)
+  config)
+
+(defn read-config-file [profile]
+  (aero/read-config
+   "resources/config.edn"
+   {:profile profile}))

@@ -65,9 +65,12 @@
     (<!! (parser env tx))))
 
 (defmethod ig/init-key :pathom/parser
-  [_ {:keys [viz-enabled? parser-id db]}]
-  (log/info "configuring pathom parser")
-  (cond->> (create-parser db)
-    viz-enabled? (p.viz/connect-parser
-                  {::p.viz/parser-id parser-id})
-    true (wrap-parser)))
+  [_ {:keys [parser-id db config]}]
+  (let [enabled? (:viz-enabled? config)]
+    (log/info "configuring pathom parser")
+    (when enabled?
+      (log/info "pathom-viz connection enabled, app-id: " parser-id))
+    (cond->> (create-parser db)
+      enabled? (p.viz/connect-parser
+                {::p.viz/parser-id parser-id})
+      true (wrap-parser))))

@@ -9,7 +9,7 @@
 
 (ig-repl/set-prep!
  (fn []
-   (system/read-config-file "resources/config/dev.edn")))
+   (system/read-config-file {:profile :dev})))
 
 (declare db parser)
 
@@ -19,7 +19,7 @@
   (go)
   (def db (:crux/db state/system))
   (def parser (:pathom/parser state/system))
-  :dev/ready)
+  ::ready!)
 
 (defn start-dev
   "

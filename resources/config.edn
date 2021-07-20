@@ -1,0 +1,18 @@
+{:system/config {:http-port #or [#env SERVER_PORT 7001]
+                 :crux-port #profile {:default #or [#env CRUX_PORT 7002]
+                                      :test nil}
+                 :jdbc {:host     #or [#env POSTGRES_HOST "localhost"]
+                        :port     #long #or [#env POSTGRES_PORT 5432]
+                        :dbname   #profile {:default #or [#env POSTGRES_DB "app_db"]
+                                            :test "test_db"}
+                        :user     #or [#env POSTGRES_USER "postgres"]
+                        :password #or [#env POSTGRES_PASSWORD "postgres"]}
+                 :viz-enabled? #profile {:default false
+                                         :dev true}}
+ :http/server {:handler #ig/ref :reitit/routes
+               :config #ig/ref :system/config}
+ :pathom/parser {:parser-id :pathom-fulcro-demo-app
+                 :config #ig/ref :system/config
+                 :db #ig/ref :crux/db}
+ :reitit/routes  {:parser #ig/ref :pathom/parser}
+ :crux/db {:config #ig/ref :system/config}}
