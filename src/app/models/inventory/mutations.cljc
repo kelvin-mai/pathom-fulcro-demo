@@ -6,7 +6,7 @@
             [app.models.inventory :as inventory]))
 
 #?(:clj
-   (pc/defmutation create-mutation
+   (pc/defmutation create
      [{:keys [db]} {temp-id :inventory/id :as params}]
      {::pc/sym `create
       ::pc/params [:inventory/id :inventory/name :inventory/quantity :inventory/product]
@@ -19,7 +19,7 @@
         :tempids {temp-id id}})))
 
 #?(:clj
-   (pc/defmutation update-quantity-mutation
+   (pc/defmutation update-quantity
      [{:keys [db]} {:inventory/keys [id quantity] :as params}]
      {::pc/sym `update-quantity
       ::pc/params [:inventory/id :inventory/quantity]
@@ -32,5 +32,5 @@
         :inventory/id id})))
 
 #?(:clj
-   (def mutations [create-mutation
-                   update-quantity-mutation]))
+   (def mutations [create
+                   update-quantity]))

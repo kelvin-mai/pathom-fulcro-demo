@@ -20,9 +20,10 @@
    :ident (fn [] [:component/id :products])
    :initial-state {:products []}}
   (dom/div
-   (dom/button {:type "button"
+   (dom/button :.px-4.py-1.m-2.bg-red-600.text-white.rounded
+               {:type "button"
                 :onClick #(comp/transact! this
-                                          `[(product.mutation
+                                          `[(product.mutation/create
                                              ~{:product/id (tempid)
                                                :product/name "from ui"
                                                :product/price 20})])}

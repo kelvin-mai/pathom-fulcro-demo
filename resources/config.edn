@@ -1,4 +1,4 @@
-{:system/config {:http-port #or [#env SERVER_PORT 7001]
+{:system/config {:http-port #or [#env SERVER_PORT 6969]
                  :crux-port #profile {:default #or [#env CRUX_PORT 7002]
                                       :test nil}
                  :jdbc {:host     #or [#env POSTGRES_HOST "localhost"]

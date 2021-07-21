@@ -9,6 +9,6 @@
                    :asset-path "/js/main"
 
                    :modules    {:main {:init-fn app.client/init}}
-                   :devtools   {:after-load app.client/init
+                   :devtools   {:after-load app.client/reload
                                 :preloads   [com.fulcrologic.fulcro.inspect.preload
                                              app.client.preload]}}}}

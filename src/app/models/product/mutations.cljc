@@ -7,7 +7,7 @@
             [app.models.product :as product]))
 
 #?(:clj
-   (pc/defmutation create-mutation
+   (pc/defmutation create
      [{:keys [db]} {temp-id :product/id :as params}]
      {::pc/sym `create
       ::pc/params [:product/name :product/price]
@@ -29,4 +29,4 @@
      (remote [env] true)))
 
 #?(:clj
-   (def mutations [create-mutation]))
+   (def mutations [create]))

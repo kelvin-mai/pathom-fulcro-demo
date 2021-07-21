@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "css": "postcss ./src/app/client/styles.css -o ./resources/public/css/style.css --verbose -w",
+    "css": "tailwindcss --postcss -i ./src/app/client/styles.css -o ./resources/public/css/style.css",
     "start": "shadow-cljs watch :main"
   },
   "dependencies": {

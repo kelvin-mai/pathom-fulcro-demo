@@ -6,7 +6,7 @@
             [app.client.app :refer [APP]]
             [app.client.root :refer [Root]]))
 
-(defn ^:after-load reload []
+(defn ^:export ^:dev/after-load reload []
   (app/mount! APP Root "app")
   (comp/refresh-dynamic-queries! APP)
   (js/console.log "reloaded"))
