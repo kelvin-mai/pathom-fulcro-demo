@@ -1,4 +1,4 @@
-(ns app.utils.headlessui
+(ns app.client.ui.headlessui
   "CLJS Fulcro translation of headlessui https://headlessui.dev/"
   (:require [com.fulcrologic.fulcro.algorithms.react-interop :as interop]
             [com.fulcrologic.fulcro.dom-common :refer [interpret-classes]]

@@ -13,7 +13,7 @@
   [{:keys [db]} {:inventory/keys [id]}]
   {::pc/input #{:inventory/id}
    ::pc/output [:inventory/name :inventory/quantity :inventory/product]}
-  (let [entity (db/get-entity db :inventory id)]
+  (let [entity (db/get-entity db :inventory/id id)]
     (update entity :inventory/product id->ident :product/id)))
 
 (defresolver inventory-history-resolver

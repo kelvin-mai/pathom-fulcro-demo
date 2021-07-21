@@ -5,14 +5,14 @@
 
 (defresolver products-resolver
   [{:keys [db]} _]
-  {::pc/output [{:product/all [:product/id]}]}
-  {::product/all (db/get-all-idents db :product)})
+  {::pc/output [{::product/all [::product/id]}]}
+  {::product/all (db/get-all-idents db ::product/id)})
 
 (defresolver product-resolver
-  [{:keys [db]} {:product/keys [id]}]
-  {::pc/input #{:product/id}
-   ::pc/output [:product/name :product/price]}
-  (db/get-entity db :product id))
+  [{:keys [db]} {::product/keys [id]}]
+  {::pc/input #{::product/id}
+   ::pc/output [::product/name ::product/price]}
+  (db/get-entity db ::product/id id))
 
 (def resolvers [products-resolver
                 product-resolver])

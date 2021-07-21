@@ -11,6 +11,13 @@
   (or (tempid? id)
       (uuid? id)))
 
+(defn remove-from-idents
+  [idents id]
+  (filterv
+   (fn [ident]
+     (not= id (second ident)))
+   idents))
+
 (defn server-validation [spec params]
   (when (not (s/valid? spec params))
     (throw
@@ -18,3 +25,9 @@
               {:transaction/success false
                :transaction/error "failed validation"
                :transaction/explain (s/explain-data spec params)}))))
+
+(defn server-not-found []
+  (throw
+   (ex-info "entity not found"
+            {:transaction/success false
+             :transaction/error "entity not found"})))

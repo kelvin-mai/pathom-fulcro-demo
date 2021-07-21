@@ -12,7 +12,7 @@
       ::pc/params [:inventory/id :inventory/name :inventory/quantity :inventory/product]
       ::pc/output [:transaction/success :inventory/id]}
      (models/server-validation ::inventory/create params)
-     (let [{:inventory/keys [id] :as entity} (db/new-entity :inventory params)
+     (let [{:inventory/keys [id] :as entity} (db/new-entity :inventory/id params)
            tx-status (db/submit! db [[:crux.tx/put entity]])]
        {:transaction/success tx-status
         :inventory/id id
@@ -25,7 +25,7 @@
       ::pc/params [:inventory/id :inventory/quantity]
       ::pc/output [:transaction/success :inventory/id]}
      (models/server-validation ::inventory/update-quantity params)
-     (let [{:inventory/keys [id] :as entity} (db/get-entity db :inventory id)
+     (let [{:inventory/keys [id] :as entity} (db/get-entity db :inventory/id id)
            entity (assoc entity :inventory/quantity quantity)
            tx-status (db/submit! db [[:crux.tx/put entity]])]
        {:transaction/success tx-status

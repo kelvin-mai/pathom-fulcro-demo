@@ -2,6 +2,7 @@
   (:require [com.fulcrologic.fulcro.application :as app]
             [com.fulcrologic.fulcro.data-fetch :as df]
             [com.fulcrologic.fulcro.networking.http-remote :as http]
+            [app.models.product :as product]
             [app.models.product.ui :refer [Product]]
             [app.models.inventory.ui :refer [Inventory]]))
 
@@ -11,11 +12,6 @@
                        {:url "http://localhost:6969/api"})}
     :client-did-mount
     (fn [app]
-      (df/load! app :products/all
+      (df/load! app ::product/all
                 Product
-                {:target [:component/id :products :products]})
-      (df/load! APP :inventory/all
-                Inventory
-                {:target [:component/id :inventories :inventories]}))
-    ;
-    }))
+                {:target [:component/id :products :products]}))}))
