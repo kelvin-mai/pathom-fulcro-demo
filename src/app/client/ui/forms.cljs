@@ -25,22 +25,22 @@
      :invalid? is-invalid?
      :value    value}))
 
-(defn ui-input [component field props]
+(defn ui-input [component field {:keys [label] :as props}]
   (let [{:keys [id value invalid?]} (field-attrs component field)
         classes (cond-> [input-style]
                   (:classes props) (concat (:classes props))
                   (:className props) (conj (:className props))
                   invalid? (conj "border-red"))
         props (merge
-               (dissoc props :classes :className)
+               (dissoc props :classes :className :label)
                {:id id
                 :value value
-                :classes classes})]
-    (js/console.log :ui-input props)
+                :classes classes
+                :onBlur #(comp/transact! component [(fs/mark-complete! {:field field})])})]
     (dom/div
      (dom/label {:htmlFor id
                  :classes [label-style]}
-                "Create Product")
+                label)
      (dom/input props))))
 
 (defn ui-dropdown [{:keys [value onChange options placeholder] :as props}]

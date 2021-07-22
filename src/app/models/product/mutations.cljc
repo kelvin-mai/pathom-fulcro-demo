@@ -42,7 +42,13 @@
                     (models/server-not-found))
            tx-status (db/submit! db [[:crux.tx/put entity]])]
        {:transaction/success tx-status
-        ::product/id id})))
+        ::product/id id}))
+   :cljs
+   (m/defmutation update!
+     [{::product/keys [id]}]
+     (action [{:keys [state]}]
+             (fs/entity->pristine* state [::product/id id]))
+     (remote [env] true)))
 
 #?(:clj
    (pc/defmutation delete!
