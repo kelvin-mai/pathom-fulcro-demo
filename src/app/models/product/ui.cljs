@@ -4,9 +4,9 @@
             [com.fulcrologic.fulcro.algorithms.tempid :refer [tempid]]
             [com.fulcrologic.fulcro.algorithms.form-state :as fs]
             [com.fulcrologic.fulcro.algorithms.normalized-state :refer [swap!->]]
-            [com.fulcrologic.fulcro.algorithms.merge :as merge]
             [app.models.product :as product]
             [app.models.product.mutations :as product.mutation]
+            [app.client.ui.headlessui :refer [headless-ui]]
             [app.client.ui.icons :refer [ui-icon]]
             [app.client.ui.forms :refer [ui-input]]
             [app.client.ui.table :as table]
@@ -20,45 +20,83 @@
    :initial-state {::product/id :none
                    ::product/name ""
                    ::product/price 0}}
-  (dom/form :.m-2
-            {:onSubmit (fn [e]
-                         (.preventDefault e)
-                         (if (uuid? id)
-                           (comp/transact! this
-                                           `[(product.mutation/update!
-                                              ~{::product/id id
-                                                ::product/name name
-                                                ::product/price price})])
-                           (comp/transact! this
-                                           `[(product.mutation/create!
-                                              ~{::product/id (tempid)
-                                                ::product/name name
-                                                ::product/price price})])))}
-            (ui-input this ::product/name {:label "Product Name"
-                                           :onChange #(m/set-string! this ::product/name :event %)})
-            (ui-input this ::product/price {:label "Product Price"
-                                            :type "number"
-                                            :onChange #(m/set-double! this ::product/price :event %)})
-            (dom/button :.border.px-8.py-1.rounded.font-bold.my-2.bg-red-400.text-white
-                        {:type "button"
-                         :onClick #(comp/transact! this `[(fs/reset-form!)])}
-                        "Reset")
-            (dom/button :.border.px-8.py-1.rounded.font-bold.my-2.bg-blue-600.text-white
-                        {:type "button"
-                         :onClick #(comp/transact! this `[(set-edit-form)])}
-                        "New")
-            (dom/button :.border.px-8.py-1.rounded.font-bold.my-2.bg-gray-800.text-white
-                        {:type "submit"}
-                        "Submit")))
+  (let [onClose (comp/get-computed this :onClose)]
+    (dom/div :.bg-white.rounded.mx-auto.z-50
+             (headless-ui
+              :dialog-title
+              {:classes [:.uppercase.text-center.font-bold.pt-2]}
+              (if (uuid? id)
+                (str "Update Product #" id)
+                "Create Product"))
+             (dom/form :.m-2
+                       {:onSubmit (fn [e]
+                                    (.preventDefault e)
+                                    (let [submit-fn (if (uuid? id)
+                                                      #(comp/transact! this
+                                                                       `[(product.mutation/update!
+                                                                          ~{::product/id id
+                                                                            ::product/name name
+                                                                            ::product/price price})])
+                                                      #(comp/transact! this
+                                                                       `[(product.mutation/create!
+                                                                          ~{::product/id (tempid)
+                                                                            ::product/name name
+                                                                            ::product/price price})]))
+                                          validity (fs/get-spec-validity props)
+                                          dirty? (fs/dirty? props)]
+                                      (if (and (= :valid validity)
+                                               dirty?)
+                                        (do
+                                          (submit-fn)
+                                          (onClose))
+                                        (comp/transact! this [(fs/mark-complete! props)]))))}
+                       (ui-input this ::product/name {:label "Product Name"
+                                                      :onChange #(m/set-string! this ::product/name :event %)})
+                       (ui-input this ::product/price {:label "Product Price"
+                                                       :type "number"
+                                                       :onChange #(m/set-double! this ::product/price :event %)})
+                       (dom/div :.flex.justify-between
+                                (dom/button :.border.px-8.py-1.rounded.font-bold.my-2.bg-red-600.text-white
+                                            {:type "button"
+                                             :onClick onClose}
+                                            "Cancel")
+                                (dom/div
+                                 (dom/button :.border.px-8.py-1.rounded.font-bold.my-2.bg-gray-600.text-white
+                                             {:type "button"
+                                              :onClick #(do
+                                                          (comp/transact! this [(fs/clear-complete! props)])
+                                                          (comp/transact! this `[(fs/reset-form!)]))}
+                                             "Reset")
+                                 (dom/button :.border.px-8.py-1.rounded.font-bold.my-2.bg-blue-800.text-white
+                                             {:type "submit"}
+                                             "Submit")))))))
 
-(def ui-product-form (comp/factory ProductForm {:keyfn ::product/id}))
+(def ui-product-form (comp/computed-factory ProductForm {:keyfn ::product/id}))
 
 (defsc ProductFormPanel
-  [this {:keys [product-form] :as props}]
-  {:query [{:product-form (comp/get-query ProductForm)}]
+  [this {:keys [product-form ui/open?]}]
+  {:query [:ui/open?
+           {:product-form (comp/get-query ProductForm)}]
    :ident (fn [] [:component/id :product-form-panel])
-   :initial-state (fn [_] {:product-form (comp/get-initial-state ProductForm)})}
-  (ui-product-form product-form))
+   :initial-state (fn [_] {:ui/open? true
+                           :product-form (comp/get-initial-state ProductForm)})
+   :initLocalState (fn [this _]
+                     {:onClose #(m/set-value! this :ui/open? false)})
+   :componentDidMount (fn [this _]
+                        (comp/transact! this `[(set-edit-form)]))}
+  (let [onClose (comp/get-state this :onClose)]
+    (headless-ui
+     :dialog
+     {:open open?
+      :onClose onClose
+      :classes [:.fixed.inset-0.z-10.overflow-y-auto]}
+     (dom/div :.flex.items-center.justify-center.min-h-screen
+              (headless-ui
+               :dialog-overlay
+               {:classes [:.fixed.inset-0.bg-black.opacity-80]})
+              (dom/div :.bg-white.rounded.mx-auto.z-50
+                       {:classes ["w-3/5"]}
+                       (ui-product-form (comp/computed product-form {:onClose onClose})))))))
 
 (def ui-product-form-panel (comp/factory ProductFormPanel))
 
@@ -104,8 +142,12 @@
                                           `[(product.mutation/create!
                                              ~{::product/id (tempid)
                                                ::product/name "from ui"
-                                               ::product/price 20})])}
+                                               ::product/price 20.45})])}
                "TEST")
+   (dom/button :.border.px-8.py-1.rounded.font-bold.my-2.bg-blue-600.text-white
+               {:type "button"
+                :onClick #(comp/transact! this `[(set-edit-form)])}
+               "New")
    (table/ui-table {:heads ["ID" "Name" "Price" nil]
                     :classes ["m-4"]}
                    (map ui-product products))))
@@ -113,7 +155,7 @@
 (def ui-products (comp/factory Products))
 
 (m/defmutation set-edit-form
-  [{::product/keys [id] :as params}]
+  [{::product/keys [id]}]
   (action [{:keys [state]}]
           (let [id (or id :none)
                 empty-product {::product/id :none
@@ -125,5 +167,6 @@
                                      s))]
             (swap!-> state
                      (assoc-in [:component/id :product-form-panel :product-form] [::product/id id])
+                     (assoc-in [:component/id :product-form-panel :ui/open?] true)
                      (init-create-form)
                      (fs/add-form-config* ProductForm [::product/id id])))))

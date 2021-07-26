@@ -50,8 +50,10 @@
    :transition-child (.-Child Transition)})
 
 (defn headless-ui
-  [component-name props children]
-  (let [component (get components component-name)
-        component (interop/react-factory component)
-        props (interpret-classes props)]
-    (component props children)))
+  ([component-name props]
+   (headless-ui component-name props nil))
+  ([component-name props children]
+   (let [component (get components component-name)
+         component (interop/react-factory component)
+         props (interpret-classes props)]
+     (component props children))))

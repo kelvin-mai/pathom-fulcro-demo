@@ -47,8 +47,9 @@
    (m/defmutation update!
      [{::product/keys [id]}]
      (action [{:keys [state]}]
-             (fs/entity->pristine* state [::product/id id]))
-     (remote [env] true)))
+             (swap! state fs/entity->pristine* [::product/id id])
+             state)
+     (remote [env] false)))
 
 #?(:clj
    (pc/defmutation delete!

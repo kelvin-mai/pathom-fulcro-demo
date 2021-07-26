@@ -30,11 +30,11 @@
         classes (cond-> [input-style]
                   (:classes props) (concat (:classes props))
                   (:className props) (conj (:className props))
-                  invalid? (conj "border-red"))
+                  invalid? (conj "border-red-500"))
         props (merge
                (dissoc props :classes :className :label)
                {:id id
-                :value value
+                :value (or (str value) "")
                 :classes classes
                 :onBlur #(comp/transact! component [(fs/mark-complete! {:field field})])})]
     (dom/div
