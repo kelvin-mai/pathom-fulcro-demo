@@ -8,7 +8,7 @@
   []
   (fn [test-fn]
     (reset! test-system
-            (let [ig-config (system/read-config-file {:profile :test})]
+            (let [ig-config (system/read-config-file :test)]
               (ig/init ig-config)))
     (test-fn)
     (ig/halt! @test-system)

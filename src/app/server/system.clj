@@ -16,7 +16,10 @@
   (log/info "system starting with config" config)
   config)
 
-(defn read-config-file [profile]
-  (aero/read-config
-   "resources/config.edn"
-   {:profile profile}))
+(defn read-config-file
+  ([]
+   (read-config-file :prod))
+  ([profile]
+   (aero/read-config
+    "resources/config.edn"
+    {:profile profile})))

@@ -9,7 +9,7 @@
 
 (ig-repl/set-prep!
  (fn []
-   (system/read-config-file {:profile :dev})))
+   (system/read-config-file :dev)))
 
 (declare db parser)
 

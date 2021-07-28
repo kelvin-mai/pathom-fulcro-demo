@@ -3,4 +3,4 @@
 
 (defn -main
   []
-  (system/read-config-file {:profile :prod}))
+  (system/read-config-file))
