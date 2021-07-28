@@ -3,8 +3,10 @@
             [com.fulcrologic.fulcro.application :as app]
             [com.fulcrologic.fulcro.inspect.inspect-client :as inspect]
             [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
+            [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
             [app.client.app :refer [APP]]
-            [app.client.root :refer [Root]]))
+            [app.client.root :refer [Root]]
+            [app.models.product.ui :refer [Products]]))
 
 (defn ^:export ^:dev/after-load reload []
   (app/mount! APP Root "app")
@@ -14,4 +16,5 @@
 (defn ^:export init []
   (log/info "application starting")
   (inspect/app-started! APP)
-  (app/mount! APP Root "app"))
+  (app/mount! APP Root "app")
+  (dr/change-route! APP (dr/path-to Products)))

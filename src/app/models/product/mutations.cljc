@@ -3,6 +3,8 @@
             [com.fulcrologic.fulcro.mutations :as m]
             [com.fulcrologic.fulcro.algorithms.normalized-state :refer [swap!->]]
             [com.fulcrologic.fulcro.algorithms.form-state :as fs]
+            [com.fulcrologic.fulcro.components :as comp]
+            [com.fulcrologic.fulcro.algorithms.merge :as merge]
             #?(:clj [app.utils.db :as db])
             [app.utils.models :as models]
             [app.models.product :as product]))
@@ -71,6 +73,19 @@
                       (update ::product/id dissoc id)
                       (update-in [:component/id :products :products] models/remove-from-idents id)))
      (remote [env] true)))
+
+#?(:cljs
+   (m/defmutation set-edit-form
+     [{::product/keys [id]}]
+     (action [{:keys [state]}]
+             (let [id (or id :none)
+                   ident [::product/id id]
+                   product-form-class (comp/registry-key->class :app.models.product.ui/ProductForm)
+                   product-form-panel-class (comp/registry-key->class :app.models.product.ui/ProductFormPanel)]
+               (swap!-> state
+                        (merge/merge-component product-form-panel-class {:product-form ident
+                                                                         :ui/open? true})
+                        (fs/add-form-config* product-form-class ident))))))
 
 #?(:clj
    (def mutations [create!

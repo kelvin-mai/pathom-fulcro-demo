@@ -3,7 +3,8 @@
             [com.fulcrologic.fulcro.dom :as dom]
             [com.fulcrologic.fulcro.algorithms.tempid :refer [tempid]]
             [com.fulcrologic.fulcro.algorithms.form-state :as fs]
-            [com.fulcrologic.fulcro.algorithms.normalized-state :refer [swap!->]]
+            [com.fulcrologic.fulcro.data-fetch :as df]
+            [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
             [app.models.product :as product]
             [app.models.product.mutations :as product.mutation]
             [app.client.ui.headlessui :refer [headless-ui]]
@@ -19,8 +20,16 @@
    :form-fields #{::product/name ::product/price}
    :initial-state {::product/id :none
                    ::product/name ""
-                   ::product/price 0}}
-  (let [onClose (comp/get-computed this :onClose)]
+                   ::product/price 0}
+   :pre-merge (fn [{:keys [data-tree]}]
+                (fs/add-form-config ProductForm data-tree))}
+  (let [onClose (comp/get-computed this :onClose)
+        reset-form #(do
+                      (comp/transact! this [(fs/clear-complete! props)])
+                      (comp/transact! this `[(fs/reset-form!)]))
+        reset-and-close #(do
+                           (reset-form)
+                           (onClose))]
     (dom/div :.bg-white.rounded.mx-auto.z-50
              (headless-ui
               :dialog-title
@@ -58,14 +67,12 @@
                        (dom/div :.flex.justify-between
                                 (dom/button :.border.px-8.py-1.rounded.font-bold.my-2.bg-red-600.text-white
                                             {:type "button"
-                                             :onClick onClose}
+                                             :onClick reset-and-close}
                                             "Cancel")
                                 (dom/div
                                  (dom/button :.border.px-8.py-1.rounded.font-bold.my-2.bg-gray-600.text-white
                                              {:type "button"
-                                              :onClick #(do
-                                                          (comp/transact! this [(fs/clear-complete! props)])
-                                                          (comp/transact! this `[(fs/reset-form!)]))}
+                                              :onClick reset-form}
                                              "Reset")
                                  (dom/button :.border.px-8.py-1.rounded.font-bold.my-2.bg-blue-800.text-white
                                              {:type "submit"}
@@ -81,9 +88,7 @@
    :initial-state (fn [_] {:ui/open? true
                            :product-form (comp/get-initial-state ProductForm)})
    :initLocalState (fn [this _]
-                     {:onClose #(m/set-value! this :ui/open? false)})
-   :componentDidMount (fn [this _]
-                        (comp/transact! this `[(set-edit-form)]))}
+                     {:onClose #(m/set-value! this :ui/open? false)})}
   (let [onClose (comp/get-state this :onClose)]
     (headless-ui
      :dialog
@@ -115,7 +120,7 @@
                   (dom/button :.text-gray-500.mr-4
                               {:onClick
                                #(comp/transact! this
-                                                `[(set-edit-form
+                                                `[(product.mutation/set-edit-form
                                                    ~{::product/id id})])}
                               (ui-icon :edit))
                   (dom/button :.text-red-400
@@ -133,7 +138,17 @@
            {:product-form-panel (comp/get-query ProductFormPanel)}]
    :ident (fn [] [:component/id :products])
    :initial-state {:products []
-                   :product-form-panel {}}}
+                   :product-form-panel {}}
+   :route-segment ["products"]
+   :will-enter (fn [app _]
+                 (dr/route-deferred
+                  [:component/id :products]
+                  (fn []
+                    (df/load! app ::product/all
+                              Product
+                              {:target [:component/id :products :products]
+                               :post-mutation `dr/target-ready
+                               :post-mutation-params {:target [:component/id :products]}}))))}
   (dom/div
    (ui-product-form-panel product-form-panel)
    (dom/button :.px-4.py-1.m-2.bg-red-600.text-white.rounded
@@ -146,27 +161,10 @@
                "TEST")
    (dom/button :.border.px-8.py-1.rounded.font-bold.my-2.bg-blue-600.text-white
                {:type "button"
-                :onClick #(comp/transact! this `[(set-edit-form)])}
+                :onClick #(comp/transact! this `[(product.mutation/set-edit-form)])}
                "New")
    (table/ui-table {:heads ["ID" "Name" "Price" nil]
                     :classes ["m-4"]}
                    (map ui-product products))))
 
 (def ui-products (comp/factory Products))
-
-(m/defmutation set-edit-form
-  [{::product/keys [id]}]
-  (action [{:keys [state]}]
-          (let [id (or id :none)
-                empty-product {::product/id :none
-                               ::product/name ""
-                               ::product/price 0}
-                init-create-form (fn [s]
-                                   (if (= id :none)
-                                     (assoc-in s [::product/id :none] empty-product)
-                                     s))]
-            (swap!-> state
-                     (assoc-in [:component/id :product-form-panel :product-form] [::product/id id])
-                     (assoc-in [:component/id :product-form-panel :ui/open?] true)
-                     (init-create-form)
-                     (fs/add-form-config* ProductForm [::product/id id])))))

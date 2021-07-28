@@ -9,9 +9,8 @@
 (defonce APP
   (app/fulcro-app
    {:remotes {:remote (http/fulcro-http-remote
-                       {:url "http://localhost:6969/api"})}
-    :client-did-mount
-    (fn [app]
-      (df/load! app ::product/all
-                Product
-                {:target [:component/id :products :products]}))}))
+                       {:url "http://localhost:6969/api"})}}))
+
+(comment
+  (require '[com.fulcrologic.fulcro.routing.dynamic-routing :as dr :refer [defrouter]])
+  (dr/change-route! APP (dr/path-to app.models.inventory.ui/Inventories)))
