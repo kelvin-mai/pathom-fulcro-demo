@@ -7,7 +7,6 @@
 
 (defrouter RootRouter [this props]
   {:router-targets [Products Inventories]}
-  (js/console.log props)
   (dom/div "Loading..."))
 
 (def ui-root-router (comp/factory RootRouter))
@@ -19,4 +18,3 @@
   (ui-root-router router))
 
 (def ui-root (comp/factory Root))
-

@@ -5,13 +5,14 @@
             [com.fulcrologic.fulcro.algorithms.form-state :as fs]
             [com.fulcrologic.fulcro.data-fetch :as df]
             [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
+            [com.fulcrologic.fulcro.mutations :as m]
             [app.models.product :as product]
             [app.models.product.mutations :as product.mutation]
+            [app.client.routing :as r]
             [app.client.ui.headlessui :refer [headless-ui]]
             [app.client.ui.icons :refer [ui-icon]]
             [app.client.ui.forms :refer [ui-input]]
-            [app.client.ui.table :as table]
-            [com.fulcrologic.fulcro.mutations :as m]))
+            [app.client.ui.table :as table]))
 
 (defsc ProductForm
   [this {::product/keys [id name price] :as props}]
@@ -140,6 +141,8 @@
    :initial-state {:products []
                    :product-form-panel {}}
    :route-segment ["products"]
+   ::r/route [^:alias ["/" {:name :default :segment ["products"]}]
+              ["/products" {:name :products :segment ["products"]}]]
    :will-enter (fn [app _]
                  (dr/route-deferred
                   [:component/id :products]

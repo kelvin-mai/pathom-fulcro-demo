@@ -3,6 +3,7 @@
             [com.fulcrologic.fulcro.dom :as dom]
             [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
             [com.fulcrologic.fulcro.data-fetch :as df]
+            [app.client.routing :as r]
             [app.models.inventory :as inventory]))
 
 (defsc Inventory
@@ -20,6 +21,7 @@
    :ident (fn [] [:component/id :inventories])
    :initial-state {:inventories []}
    :route-segment ["inventory"]
+   ::r/route ["/inventory" {:name :inventory :segment ["inventory"]}]
    :will-enter (fn [app _]
                  (dr/route-deferred
                   [:component/id :inventories]
