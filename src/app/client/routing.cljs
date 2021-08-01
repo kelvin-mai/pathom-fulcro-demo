@@ -3,21 +3,15 @@
   (provided under an MIT license)"
   (:require
    [com.fulcrologic.fulcro.application :as app]
-   [com.fulcrologic.fulcro.components :as c :refer [defsc]]
-   [com.fulcrologic.fulcro.dom :as dom]
-   [com.fulcrologic.fulcro.algorithms.normalized-state :refer [swap!->]]
+   [com.fulcrologic.fulcro.components :as c]
    [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
    [goog.object :as g]
-   [reitit.core :as r]
    [reitit.frontend :as rf]
    [reitit.frontend.easy :as rfe]
    [taoensso.timbre :as log]))
 
 (defn router-state* [app]
   (-> app ::app/state-atom deref (get-in [::router :router])))
-
-(defn router-registered? [app]
-  (boolean (router-state* app)))
 
 (defn map-vals [f m]
   (into {} (map (juxt key (comp f val))) m))

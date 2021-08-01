@@ -1,7 +1,6 @@
 (ns app.server.parser
   (:require [taoensso.timbre :as log]
             [integrant.core :as ig]
-            [clojure.core.async :refer [<!!]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc :refer [defresolver]]
             [com.wsscode.pathom.viz.ws-connector.core :as p.viz]
@@ -43,15 +42,16 @@
   req)
 
 (defn create-parser [db]
-  (p/parallel-parser
+  (p/parser
    {::p/env {::p/reader                [p/map-reader
-                                        pc/parallel-reader
+                                        pc/reader2
+                                        pc/index-reader
                                         pc/open-ident-reader
                                         p/env-placeholder-reader]
              ::p/placeholder-prefixes #{">"}
              ::pc/mutation-join-globals [:tempids]
              ::p/process-error process-error}
-    ::p/mutate pc/mutate-async
+    ::p/mutate pc/mutate
     ::p/plugins [(pc/connect-plugin {::pc/register registry})
                  (p/env-wrap-plugin (fn [env]
                                       (assoc env
@@ -59,10 +59,6 @@
                  (preprocess-parser-plugin log-requests)
                  p/error-handler-plugin
                  (p/post-process-parser-plugin p/elide-not-found)]}))
-
-(defn wrap-parser [parser]
-  (fn [env tx]
-    (<!! (parser env tx))))
 
 (defmethod ig/init-key :pathom/parser
   [_ {:keys [parser-id db config]}]
@@ -72,5 +68,4 @@
       (log/info "pathom-viz connection enabled, app-id: " parser-id))
     (cond->> (create-parser db)
       enabled? (p.viz/connect-parser
-                {::p.viz/parser-id parser-id})
-      true (wrap-parser))))
+                {::p.viz/parser-id parser-id}))))

@@ -86,7 +86,7 @@
   {:query [:ui/open?
            {:product-form (comp/get-query ProductForm)}]
    :ident (fn [] [:component/id :product-form-panel])
-   :initial-state (fn [_] {:ui/open? true
+   :initial-state (fn [_] {:ui/open? false
                            :product-form (comp/get-initial-state ProductForm)})
    :initLocalState (fn [this _]
                      {:onClose #(m/set-value! this :ui/open? false)})}
